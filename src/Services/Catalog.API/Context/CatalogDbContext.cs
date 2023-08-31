@@ -14,5 +14,7 @@ namespace Catalog.API.Context
         public CatalogDbContext() : base(connectionString, databaseName)
         {
         }
+
+
     }
 }
