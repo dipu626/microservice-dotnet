@@ -41,5 +41,58 @@ namespace Discount.GRPC.Services
 
             return this.mapper.Map<CouponResponse>(coupon);
         }
+
+        public override async Task<CouponResponse> CreateDiscount(CouponRequest request, ServerCallContext context)
+        {
+            Coupon coupon = this.mapper.Map<Coupon>(request);
+            bool isCreated = await this.couponRepository.CreateDiscountAsync(coupon);
+
+            if (!isCreated)
+            {
+                this.logger.LogInformation("Discount save failed.");
+
+                throw new RpcException(new Status(StatusCode.Internal, "Discount saved failed."));
+            }
+
+            this.logger.LogInformation($"Discount is successfully created. ProductName: {coupon.ProductName}");
+
+            return this.mapper.Map<CouponResponse>(coupon);
+        }
+
+        public override async Task<CouponResponse> UpdateDiscount(CouponRequest request, ServerCallContext context)
+        {
+            Coupon coupon = this.mapper.Map<Coupon>(request);
+            bool isUpdated = await this.couponRepository.UpdateDiscountAsync(coupon);
+
+            if (!isUpdated)
+            {
+                this.logger.LogInformation("Discount update failed.");
+
+                throw new RpcException(new Status(StatusCode.Internal, "Discount update failed"));
+            }
+
+            this.logger.LogInformation($"Discount is successfully updated. ProductName: {coupon.ProductName}");
+
+            return this.mapper.Map<CouponResponse>(coupon);
+        }
+
+        public override async Task<DeleteDiscountResponse> DeleteDiscount(DeleteDiscountRequest request, ServerCallContext context)
+        {
+            bool isDeleted = await this.couponRepository.DeleteDiscountAsync(request.ProductId);
+
+            if (!isDeleted)
+            {
+                this.logger.LogInformation("Discount delete failed.");
+
+                throw new RpcException(new Status(StatusCode.Internal, "Discount delete failed."));
+            }
+
+            this.logger.LogInformation("Discount deleted successfully.");
+
+            return new DeleteDiscountResponse
+            {
+                Success = true,
+            };
+        }
     }
 }
