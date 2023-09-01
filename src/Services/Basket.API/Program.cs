@@ -1,3 +1,4 @@
+using Basket.API.GRPCServices;
 using Basket.API.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +16,7 @@ builder.Services.AddStackExchangeRedisCache(options =>
 });
 
 builder.Services.AddScoped<IBasketRepository, BasketRepository>();
+builder.Services.AddScoped<IDiscountGRPCService, DiscountGRPCService>();
 
 var app = builder.Build();
 

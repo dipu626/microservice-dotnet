@@ -1,6 +1,8 @@
-﻿using Basket.API.Models;
+﻿using Basket.API.GRPCServices;
+using Basket.API.Models;
 using Basket.API.Repositories;
 using CoreApiResponse;
+using Discount.GRPC.Protos;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -11,10 +13,12 @@ namespace Basket.API.Controllers
     public class BasketController : BaseController
     {
         private readonly IBasketRepository basketRepository;
+        private readonly IDiscountGRPCService discountGRPCService;
 
-        public BasketController(IBasketRepository basketRepository)
+        public BasketController(IBasketRepository basketRepository, IDiscountGRPCService discountGRPCService)
         {
             this.basketRepository = basketRepository;
+            this.discountGRPCService = discountGRPCService;
         }
 
         [HttpGet]
@@ -35,18 +39,25 @@ namespace Basket.API.Controllers
 
         [HttpPost]
         [ProducesResponseType(typeof(ShoppingCart), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> UpdateBasket([FromBody]ShoppingCart basket)
+        public async Task<IActionResult> UpdateBasket([FromBody] ShoppingCart basket)
         {
             try
             {
                 // Communicate Discount.GRPC to check if this product has any discount or not
                 // Calculate final price
+                // Create DiscountGRPC Service
+
+                foreach (ShoppingCartItem item in basket.Items)
+                {
+                    CouponResponse coupon = await this.discountGRPCService.GetDiscount(item.ProductId);
+                    item.Price -= coupon.Amount;
+                }
 
                 ShoppingCart updatedBasket = await basketRepository.UpdateBasketAsync(basket);
 
                 return CustomResult("Basket modified done.", updatedBasket);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return CustomResult(ex.Message, HttpStatusCode.BadRequest);
             }
