@@ -1,7 +1,6 @@
 ﻿using CoreApiResponse;
 using Discount.API.Models;
 using Discount.API.Repository;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
