@@ -39,6 +39,9 @@ namespace Basket.API.Controllers
         {
             try
             {
+                // Communicate Discount.GRPC to check if this product has any discount or not
+                // Calculate final price
+
                 ShoppingCart updatedBasket = await basketRepository.UpdateBasketAsync(basket);
 
                 return CustomResult("Basket modified done.", updatedBasket);
