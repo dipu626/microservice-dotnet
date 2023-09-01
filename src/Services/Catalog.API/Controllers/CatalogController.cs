@@ -56,8 +56,12 @@ namespace Catalog.API.Controllers
         {
             try
             {
-                var product = this.productManager.GetById(id);
-                return CustomResult("Get data successfully..", product, HttpStatusCode.OK);
+                Product product = this.productManager.GetById(id);
+                if (product is not null)
+                {
+                    return CustomResult("Get data successfully..", product, HttpStatusCode.OK);
+                }
+                return CustomResult("Product not found.", HttpStatusCode.NotFound);
             }
             catch (Exception ex)
             {
